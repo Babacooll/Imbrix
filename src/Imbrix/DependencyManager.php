@@ -15,6 +15,8 @@ class DependencyManager
     protected $treated    = [];
 
     /**
+     * Adds a service (closure) known by his serviceName to the services list after checking circular references
+     *
      * @param string   $serviceName
      * @param callable $serviceDefinition
      *
@@ -33,6 +35,8 @@ class DependencyManager
     }
 
     /**
+     * Adds a parameter (value) known by his parameterName to the parameter list
+     *
      * @param string $parameterName
      * @param string $parameterValue
      *
@@ -52,6 +56,9 @@ class DependencyManager
     }
 
     /**
+     * Get a service/parameter by his name, if it's a service and it has already
+     * been summoned before, we will return its stored value
+     *
      * @param string $name
      *
      * @return mixed
@@ -70,6 +77,9 @@ class DependencyManager
     }
 
     /**
+     * Get a service/parameter by his name, if it's a service we will return a new summon of the closure
+     * even if already summoned before
+     *
      * @param string $name
      * @param bool   $uniqueDependencies
      *
@@ -89,6 +99,8 @@ class DependencyManager
     }
 
     /**
+     * Removes a service/parameter from the DependencyManager
+     *
      * @param string $name
      */
     public function remove($name)
@@ -105,6 +117,8 @@ class DependencyManager
     }
 
     /**
+     * Dumps the services and parameters depencies mapping
+     *
      * @return array
      */
     public function dumpAll()
@@ -116,6 +130,8 @@ class DependencyManager
     }
 
     /**
+     * Dumps the services depencies mapping
+     *
      * @return array
      */
     public function dumpServices()
@@ -134,6 +150,8 @@ class DependencyManager
     }
 
     /**
+     * Dumps the parameters depencies mapping
+     *
      * @return array
      */
     public function dumpParameters()
@@ -151,6 +169,9 @@ class DependencyManager
     }
 
     /**
+     * Adds the service/parameter name to the key list
+     * (provides an easy way to get unique keys for both services and parameters)
+     *
      * @param string $keyName
      */
     protected function addKey($keyName)
@@ -163,6 +184,9 @@ class DependencyManager
     }
 
     /**
+     * Returns a service by its name, this will always return a new summon of the service,
+     * the $uniqueDependencies parameter allows you to get unique dependencies aswell
+     *
      * @param string $serviceName
      * @param bool   $uniqueDependencies
      *
@@ -184,6 +208,8 @@ class DependencyManager
     }
 
     /**
+     * Returns a parameter by its name
+     *
      * @param string $parameterName
      *
      * @return string
@@ -194,6 +220,8 @@ class DependencyManager
     }
 
     /**
+     * Checks circular references in
+     *
      * @param string   $serviceName
      * @param \Closure $serviceDefinition
      */
