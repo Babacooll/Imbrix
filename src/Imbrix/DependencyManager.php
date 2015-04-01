@@ -25,6 +25,7 @@ class DependencyManager
     public function addService($serviceName, \Closure $serviceDefinition)
     {
         $this->addKey($serviceName);
+        $this->checkCircularReferences($serviceName, $serviceDefinition);
 
         $this->services[$serviceName] = $serviceDefinition;
 
@@ -190,5 +191,21 @@ class DependencyManager
     protected function getParameter($parameterName)
     {
         return $this->parameters[$parameterName];
+    }
+
+    /**
+     * @param string   $serviceName
+     * @param \Closure $serviceDefinition
+     */
+    protected function checkCircularReferences($serviceName, \Closure $serviceDefinition)
+    {
+        $reflection        = new \ReflectionFunction($serviceDefinition);
+        $arguments         = $reflection->getParameters();
+
+        foreach ($arguments as $argument) {
+            if ($argument->getName() === $serviceName) {
+                throw new \InvalidArgumentException('Circular exception detected');
+            }
+        }
     }
 }

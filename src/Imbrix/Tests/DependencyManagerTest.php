@@ -6,6 +6,7 @@ use Imbrix\DependencyManager;
 use Imbrix\Tests\Data\Service0;
 use Imbrix\Tests\Data\Service1;
 use Imbrix\Tests\Data\Service2;
+use Imbrix\Tests\Data\Service3;
 
 /**
  * Class DependencyManagerTest
@@ -141,5 +142,16 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($dependencyManager->getUnique('service2', true), $dependencyManager->getUnique('service2', true));
         $this->assertEquals($dependencyManager->getUnique('service2', true)->getService1(), $dependencyManager->getUnique('service2', true)->getService1());
         $this->assertNotSame($dependencyManager->getUnique('service2', true)->getService1(), $dependencyManager->getUnique('service2', true)->getService1());
+    }
+
+    public function testCircularRefenrece()
+    {
+        $dependencyManager = new DependencyManager();
+
+        $this->setExpectedException('\InvalidArgumentException');
+
+        $dependencyManager->addService('service3', function ($service3) {
+            return new Service3($service3);
+        });
     }
 }
