@@ -1,6 +1,12 @@
 {
     "name": "babacooll/imbrix",
     "description": "Dependency Manager for PHP projects",
+    "authors": [
+      {
+        "name": "Babacooll",
+        "email": "michael.garrez@gmail.com"
+      }
+    ],
     "require": {
         "php": ">=5.4.0"
     },
@@ -10,10 +16,9 @@
     "autoload": {
       "psr-0": { "Imbrix": "src/" }
     },
-    "authors": [
-        {
-            "name": "Babacooll",
-            "email": "michael.garrez@gmail.com"
-        }
-    ]
+    "extra": {
+      "branch-alias": {
+        "dev-master": "0.0.1-dev"
+      }
+    }
 }
