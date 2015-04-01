@@ -1,6 +1,7 @@
 {
     "name": "babacooll/imbrix",
     "description": "Dependency Manager for PHP projects",
+    "license": "MIT",
     "authors": [
       {
         "name": "Babacooll",
