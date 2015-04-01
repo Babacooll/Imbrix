@@ -4,12 +4,14 @@
 
 Imbrix is a fully unit tested dependency manager suited for small PHP projects.
 
+[Packagist link](https://packagist.org/packages/babacooll/imbrix)
+
 ## Installation
 
 Imbrix is available through composer : 
 
 ```Shell
-$ ./composer.phar require babacooll/imbrix ~0.0.1
+$ php composer.phar require babacooll/imbrix ~0.0.1
 ```
 
 ## How to use
