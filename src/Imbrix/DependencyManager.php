@@ -150,15 +150,28 @@ class DependencyManager
     {
         $services = [];
 
-        foreach ($this->services as $serviceName => $serviceDefinition) {
-            $services[] = [
-                'name'       => $serviceName,
-                'class'      => get_class($serviceDefinition),
-                'instancied' => isset($this->treated[$serviceName])
-            ];
+        foreach ($this->services as $serviceName => $service) {
+            $services[$serviceName] = $this->getServiceDump($serviceName);
         }
 
         return $services;
+    }
+
+    /**
+     * @param string $serviceName
+     *
+     * @return array
+     */
+    public function getServiceDump($serviceName)
+    {
+        if (!isset($this->services[$serviceName]['arguments'])) {
+            $this->getServiceArguments($serviceName);
+        }
+
+        return [
+            'class'      => get_class($this->services[$serviceName]['definition']),
+            'arguments'  => $this->services[$serviceName]['arguments']
+        ];
     }
 
     /**
@@ -171,8 +184,7 @@ class DependencyManager
         $parameters = [];
 
         foreach ($this->parameters as $parameterName => $parameterValue) {
-            $parameters[] = [
-                'name'       => $parameterName,
+            $parameters[$parameterName] = [
                 'value'      => $parameterValue
             ];
         }
@@ -206,23 +218,18 @@ class DependencyManager
      */
     protected function getService($serviceName, $uniqueDependencies = false)
     {
-        $service           = $this->services[$serviceName];
-
-        if (isset($service['arguments'])) {
-            $arguments = $service['arguments'];
-        } else {
-            $reflection = new \ReflectionFunction($service['definition']);
-            $arguments = $reflection->getParameters();
-            $this->services[$serviceName]['arguments'] = $arguments;
-        }
-
+        $arguments = $this->getServiceArguments($serviceName);
         $serviceParameters = [];
 
         foreach ($arguments as $argument) {
-            $serviceParameters[$argument->getName()] = !$uniqueDependencies ? $this->get($argument->getName()) : $this->getUnique($argument->getName(), true);
+            if ($uniqueDependencies) {
+                $serviceParameters[$argument] = $this->getUnique($argument, true);
+            } else {
+                $serviceParameters[$argument] = $this->get($argument);
+            }
         }
 
-        return call_user_func_array($service['definition'], $serviceParameters);
+        return call_user_func_array($this->services[$serviceName]['definition'], $serviceParameters);
     }
 
     /**
@@ -240,18 +247,40 @@ class DependencyManager
     /**
      * Checks circular references in
      *
-     * @param string   $serviceName
-     * @param \Closure $serviceDefinition
+     * @param string $serviceName
      */
-    protected function checkCircularReferences($serviceName, \Closure $serviceDefinition)
+    protected function checkCircularReferences($serviceName)
     {
-        $reflection        = new \ReflectionFunction($serviceDefinition);
-        $arguments         = $reflection->getParameters();
+        $arguments  = $this->getServiceArguments($serviceName);
 
-        foreach ($arguments as $argument) {
-            if ($argument->getName() === $serviceName) {
+        foreach ($arguments as $argumentKey) {
+            if ($argumentKey === $serviceName) {
                 throw new \InvalidArgumentException('Circular exception detected');
             }
         }
+    }
+
+    /**
+     * @param string $serviceName
+     *
+     * @return array
+     */
+    protected function getServiceArguments($serviceName)
+    {
+        if (!isset($this->services[$serviceName])) {
+            throw new \InvalidArgumentException('Circular exception detected');
+        }
+
+        if (!isset($this->services[$serviceName]['arguments'])) {
+            $reflection = new \ReflectionFunction($this->services[$serviceName]['definition']);
+            $arguments = $reflection->getParameters();
+            $this->services[$serviceName]['arguments'] = [];
+
+            foreach ($arguments as $argument) {
+                $this->services[$serviceName]['arguments'][] = $argument->getName();
+            }
+        }
+
+        return $this->services[$serviceName]['arguments'];
     }
 }
