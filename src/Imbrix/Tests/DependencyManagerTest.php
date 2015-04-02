@@ -146,7 +146,7 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCircularRefenrece()
     {
-        $dependencyManager = new DependencyManager();
+        $dependencyManager = new DependencyManager(true);
 
         $this->setExpectedException('\InvalidArgumentException');
 

@@ -6,10 +6,9 @@ Imbrix is a fully unit tested dependency manager suited for small PHP projects.
 
 [Packagist link](https://packagist.org/packages/babacooll/imbrix)
 
-## TODO / WIP
+## Still in progress
 
 - Wrapper for DependencyManager to get *static* access to it (singleton way ?)
-- Optimizing process as some parts can be long (lot of loops)
 
 ## Installation
 

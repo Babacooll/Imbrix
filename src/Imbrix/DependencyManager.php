@@ -13,6 +13,15 @@ class DependencyManager
     protected $parameters = [];
     protected $keys       = [];
     protected $treated    = [];
+    protected $circularReferencesCheck;
+
+    /**
+     * @param bool $circularReferencesCheck
+     */
+    public function __construct($circularReferencesCheck = false)
+    {
+        $this->circularReferencesCheck = $circularReferencesCheck;
+    }
 
     /**
      * Adds a service (closure) known by his serviceName to the services list after checking circular references
@@ -27,9 +36,12 @@ class DependencyManager
     public function addService($serviceName, \Closure $serviceDefinition)
     {
         $this->addKey($serviceName);
-        $this->checkCircularReferences($serviceName, $serviceDefinition);
 
-        $this->services[$serviceName] = $serviceDefinition;
+        if ($this->circularReferencesCheck) {
+            $this->checkCircularReferences($serviceName, $serviceDefinition);
+        }
+
+        $this->services[$serviceName]['definition'] = $serviceDefinition;
 
         return $this;
     }
@@ -196,15 +208,21 @@ class DependencyManager
     {
         $service           = $this->services[$serviceName];
 
-        $reflection        = new \ReflectionFunction($service);
-        $arguments         = $reflection->getParameters();
+        if (isset($service['arguments'])) {
+            $arguments = $service['arguments'];
+        } else {
+            $reflection = new \ReflectionFunction($service['definition']);
+            $arguments = $reflection->getParameters();
+            $this->services[$serviceName]['arguments'] = $arguments;
+        }
+
         $serviceParameters = [];
 
         foreach ($arguments as $argument) {
             $serviceParameters[$argument->getName()] = !$uniqueDependencies ? $this->get($argument->getName()) : $this->getUnique($argument->getName(), true);
         }
 
-        return call_user_func_array($this->services[$serviceName], $serviceParameters);
+        return call_user_func_array($service['definition'], $serviceParameters);
     }
 
     /**
