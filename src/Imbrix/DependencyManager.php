@@ -81,7 +81,7 @@ class DependencyManager
             return $this->treated[$name];
         }
 
-        $treated = $this->getUnique($name);
+        $treated = $this->getUnique($name, false);
 
         $this->treated[$name] = $treated;
 
@@ -93,18 +93,19 @@ class DependencyManager
      * even if already summoned before
      *
      * @param string $name
+     * @param array  $customParameters
      * @param bool   $uniqueDependencies
      *
      * @return mixed
      */
-    public function getUnique($name, $uniqueDependencies = false)
+    public function getUnique($name, $customParameters = [], $uniqueDependencies = false)
     {
         if (isset($this->services[$name])) {
-            $treated = $this->getService($name, $uniqueDependencies);
+            $treated = $this->getService($name, $customParameters, $uniqueDependencies);
         } elseif (isset($this->parameters[$name])) {
             $treated = $this->getParameter($name);
         } else {
-            throw new \InvalidArgumentException('This service/parameter does not exist');
+            throw new \InvalidArgumentException(sprintf('This service/parameter %s does not exist', $name));
         }
 
         return $treated;
@@ -201,7 +202,7 @@ class DependencyManager
     protected function addKey($keyName)
     {
         if (isset($this->keys[$keyName])) {
-            throw new \InvalidArgumentException('This service/parameter already exists');
+            throw new \InvalidArgumentException(sprintf('This service/parameter %s already exists', $keyName));
         }
 
         $this->keys[$keyName] = true;
@@ -212,17 +213,21 @@ class DependencyManager
      * the $uniqueDependencies parameter allows you to get unique dependencies aswell
      *
      * @param string $serviceName
+     * @param array  $customParameters
      * @param bool   $uniqueDependencies
      *
      * @return mixed
      */
-    protected function getService($serviceName, $uniqueDependencies = false)
+    protected function getService($serviceName, $customParameters = [], $uniqueDependencies = false)
     {
         $arguments = $this->getServiceArguments($serviceName);
         $serviceParameters = [];
+        $args = func_get_args()[1];
 
         foreach ($arguments as $argument) {
-            if ($uniqueDependencies) {
+            if (isset($args[$argument])) {
+                $serviceParameters[$argument] = $args[$argument];
+            } elseif ($uniqueDependencies) {
                 $serviceParameters[$argument] = $this->getUnique($argument, true);
             } else {
                 $serviceParameters[$argument] = $this->get($argument);

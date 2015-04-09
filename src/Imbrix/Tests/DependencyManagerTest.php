@@ -138,10 +138,10 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
             return new Service2($service1);
         });
 
-        $this->assertEquals($dependencyManager->getUnique('service2', true), $dependencyManager->getUnique('service2', true));
-        $this->assertNotSame($dependencyManager->getUnique('service2', true), $dependencyManager->getUnique('service2', true));
-        $this->assertEquals($dependencyManager->getUnique('service2', true)->getService1(), $dependencyManager->getUnique('service2', true)->getService1());
-        $this->assertNotSame($dependencyManager->getUnique('service2', true)->getService1(), $dependencyManager->getUnique('service2', true)->getService1());
+        $this->assertEquals($dependencyManager->getUnique('service2', [], true), $dependencyManager->getUnique('service2', [], true));
+        $this->assertNotSame($dependencyManager->getUnique('service2', [], true), $dependencyManager->getUnique('service2', [], true));
+        $this->assertEquals($dependencyManager->getUnique('service2', [], true)->getService1(), $dependencyManager->getUnique('service2', [], true)->getService1());
+        $this->assertNotSame($dependencyManager->getUnique('service2', [], true)->getService1(), $dependencyManager->getUnique('service2', [], true)->getService1());
     }
 
     public function testCircularRefenrece()
