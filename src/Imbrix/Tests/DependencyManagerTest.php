@@ -144,6 +144,20 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($dependencyManager->getUnique('service2', [], true)->getService1(), $dependencyManager->getUnique('service2', [], true)->getService1());
     }
 
+    public function testOverridingParameters()
+    {
+        $dependencyManager = new DependencyManager();
+
+        $dependencyManager->addParameter('test', 'value');
+
+        $dependencyManager->addService('service1', function ($test) {
+            return new Service1($test);
+        });
+
+        $this->assertEquals($dependencyManager->get('service1')->getString(), 'value');
+        $this->assertEquals($dependencyManager->getUnique('service1', ['test' => 'value2'])->getString(), 'value2');
+    }
+
     public function testCircularRefenrece()
     {
         $dependencyManager = new DependencyManager(true);

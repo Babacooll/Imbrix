@@ -81,7 +81,7 @@ class DependencyManager
             return $this->treated[$name];
         }
 
-        $treated = $this->getUnique($name, false);
+        $treated = $this->getUnique($name, [], false);
 
         $this->treated[$name] = $treated;
 
@@ -222,13 +222,12 @@ class DependencyManager
     {
         $arguments = $this->getServiceArguments($serviceName);
         $serviceParameters = [];
-        $args = func_get_args()[1];
 
         foreach ($arguments as $argument) {
-            if (isset($args[$argument])) {
-                $serviceParameters[$argument] = $args[$argument];
+            if (isset($customParameters[$argument])) {
+                $serviceParameters[$argument] = $customParameters[$argument];
             } elseif ($uniqueDependencies) {
-                $serviceParameters[$argument] = $this->getUnique($argument, true);
+                $serviceParameters[$argument] = $this->getUnique($argument, [], true);
             } else {
                 $serviceParameters[$argument] = $this->get($argument);
             }
