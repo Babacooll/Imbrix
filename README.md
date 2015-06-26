@@ -1,6 +1,9 @@
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/232fea1c-ed90-46dd-939a-2b232a36312e/mini.png)](https://insight.sensiolabs.com/projects/232fea1c-ed90-46dd-939a-2b232a36312e)
-
 # Imbrix
+
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/232fea1c-ed90-46dd-939a-2b232a36312e/mini.png)](https://insight.sensiolabs.com/projects/232fea1c-ed90-46dd-939a-2b232a36312e)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Babacooll/Imbrix/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Babacooll/Imbrix/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/Babacooll/Imbrix/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Babacooll/Imbrix/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/Babacooll/Imbrix/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Babacooll/Imbrix/build-status/master)
 
 Imbrix is a fully unit tested dependency manager suited for small PHP projects.
 
