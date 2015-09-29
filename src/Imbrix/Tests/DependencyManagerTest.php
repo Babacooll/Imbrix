@@ -15,6 +15,33 @@ use Imbrix\Tests\Data\Service3;
  */
 class DependencyManagerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testAbsent()
+    {
+        $dependencyManager = new DependencyManager();
+
+        $this->setExpectedException('\InvalidArgumentException');
+
+        $dependencyManager->get('service');
+    }
+
+    public function testAbsentUnique()
+    {
+        $dependencyManager = new DependencyManager();
+
+        $this->setExpectedException('\InvalidArgumentException');
+
+        $dependencyManager->getUnique('service');
+    }
+
+    public function testAbsentServiceDump()
+    {
+        $dependencyManager = new DependencyManager();
+
+        $this->setExpectedException('\InvalidArgumentException');
+
+        $dependencyManager->getServiceDump('service');
+    }
+
     public function testParameter()
     {
         $dependencyManager = new DependencyManager();
@@ -22,6 +49,28 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
         $dependencyManager->addParameter('test', 'value');
 
         $this->assertSame($dependencyManager->get('test'), 'value');
+    }
+
+    public function testDoubleParameter()
+    {
+        $dependencyManager = new DependencyManager();
+
+        $dependencyManager->addParameter('test', 'value');
+
+        $this->setExpectedException('\InvalidArgumentException', 'This service/parameter test already exists');
+
+        $dependencyManager->addParameter('test', 'value');
+    }
+
+    public function testDoubleService()
+    {
+        $dependencyManager = new DependencyManager();
+
+        $dependencyManager->addService('test', function () {});
+
+        $this->setExpectedException('\InvalidArgumentException', 'This service/parameter test already exists');
+
+        $dependencyManager->addService('test', function () {});
     }
 
     public function testService()
