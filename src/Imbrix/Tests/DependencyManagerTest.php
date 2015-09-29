@@ -158,7 +158,7 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dependencyManager->getUnique('service1', ['test' => 'value2'])->getString(), 'value2');
     }
 
-    public function testCircularRefenrece()
+    public function testCircularReference()
     {
         $dependencyManager = new DependencyManager(true);
 
