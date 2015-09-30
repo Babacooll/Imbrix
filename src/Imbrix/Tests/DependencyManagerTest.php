@@ -211,7 +211,7 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
     {
         $dependencyManager = new DependencyManager(true);
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('\InvalidArgumentException', 'Circular exception detected');
 
         $dependencyManager->addService('service3', function ($service3) {
             return new Service3($service3);
