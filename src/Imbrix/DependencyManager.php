@@ -280,7 +280,7 @@ class DependencyManager
     protected function assertServiceExist($name)
     {
         if (empty($this->services[$name])) {
-            throw new \InvalidArgumentException('Service absent');
+            throw new \InvalidArgumentException(sprintf('Service "%s" absent', $name));
         }
     }
 }

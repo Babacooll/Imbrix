@@ -37,9 +37,9 @@ class DependencyManagerTest extends \PHPUnit_Framework_TestCase
     {
         $dependencyManager = new DependencyManager();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('\InvalidArgumentException', 'Service "books" absent');
 
-        $dependencyManager->getServiceDump('service');
+        $dependencyManager->getServiceDump('books');
     }
 
     public function testParameter()
