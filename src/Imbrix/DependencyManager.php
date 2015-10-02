@@ -81,11 +81,7 @@ class DependencyManager
             return $this->treated[$name];
         }
 
-        $treated = $this->getUnique($name, [], false);
-
-        $this->treated[$name] = $treated;
-
-        return $treated;
+        return $this->treated[$name] = $this->getUnique($name, [], false);
     }
 
     /**
@@ -101,14 +97,14 @@ class DependencyManager
     public function getUnique($name, $customParameters = [], $uniqueDependencies = false)
     {
         if (isset($this->services[$name])) {
-            $treated = $this->getService($name, $customParameters, $uniqueDependencies);
-        } elseif (isset($this->parameters[$name])) {
-            $treated = $this->getParameter($name);
-        } else {
-            throw new \InvalidArgumentException(sprintf('This service/parameter %s does not exist', $name));
+            return $this->getService($name, $customParameters, $uniqueDependencies);
         }
 
-        return $treated;
+        if (isset($this->parameters[$name])) {
+            return $this->getParameter($name);
+        }
+
+        throw new \InvalidArgumentException(sprintf('This service/parameter %s does not exist', $name));
     }
 
     /**
@@ -118,15 +114,9 @@ class DependencyManager
      */
     public function remove($name)
     {
-        if (isset($this->treated[$name])) {
-            unset($this->treated[$name]);
-        }
-        if (isset($this->services[$name])) {
-            unset($this->services[$name]);
-        }
-        if (isset($this->parameters[$name])) {
-            unset($this->parameters[$name]);
-        }
+        unset($this->treated[$name]);
+        unset($this->services[$name]);
+        unset($this->parameters[$name]);
     }
 
     /**
@@ -165,13 +155,11 @@ class DependencyManager
      */
     public function getServiceDump($serviceName)
     {
-        if (!isset($this->services[$serviceName]['arguments'])) {
-            $this->getServiceArguments($serviceName);
-        }
+        $this->assertServiceExist($serviceName);
 
         return [
             'class'      => get_class($this->services[$serviceName]['definition']),
-            'arguments'  => $this->services[$serviceName]['arguments']
+            'arguments'  => $this->getRegisterServiceArguments($serviceName)
         ];
     }
 
@@ -220,7 +208,7 @@ class DependencyManager
      */
     protected function getService($serviceName, $customParameters = [], $uniqueDependencies = false)
     {
-        $arguments = $this->getServiceArguments($serviceName);
+        $arguments = $this->getRegisterServiceArguments($serviceName);
         $serviceParameters = [];
 
         foreach ($arguments as $argument) {
@@ -251,16 +239,14 @@ class DependencyManager
     /**
      * Checks circular references in
      *
-     * @param string $serviceName
+     * @param string $name
      */
-    protected function checkCircularReferences($serviceName)
+    protected function checkCircularReferences($name, \Closure $definition)
     {
-        $arguments  = $this->getServiceArguments($serviceName);
+        $arguments  = $this->getServiceArgumentNames($definition);
 
-        foreach ($arguments as $argumentKey) {
-            if ($argumentKey === $serviceName) {
-                throw new \InvalidArgumentException('Circular exception detected');
-            }
+        if (in_array($name, $arguments, true)) {
+            throw new \InvalidArgumentException('Circular exception detected');
         }
     }
 
@@ -269,22 +255,32 @@ class DependencyManager
      *
      * @return array
      */
-    protected function getServiceArguments($serviceName)
+    protected function getRegisterServiceArguments($serviceName)
     {
-        if (!isset($this->services[$serviceName])) {
-            throw new \InvalidArgumentException('Circular exception detected');
+        $this->assertServiceExist($serviceName);
+
+        return isset($this->services[$serviceName]['arguments'])
+            ? $this->services[$serviceName]['arguments']
+            : $this->services[$serviceName]['arguments'] = $this->getServiceArgumentNames($this->services[$serviceName]['definition']);
+    }
+
+    protected function getServiceArgumentNames(\Closure $definition)
+    {
+        $reflection = new \ReflectionFunction($definition);
+        $arguments = $reflection->getParameters();
+        $names = [];
+
+        foreach ($arguments as $argument) {
+            $names[] = $argument->getName();
         }
 
-        if (!isset($this->services[$serviceName]['arguments'])) {
-            $reflection = new \ReflectionFunction($this->services[$serviceName]['definition']);
-            $arguments = $reflection->getParameters();
-            $this->services[$serviceName]['arguments'] = [];
+        return $names;
+    }
 
-            foreach ($arguments as $argument) {
-                $this->services[$serviceName]['arguments'][] = $argument->getName();
-            }
+    protected function assertServiceExist($name)
+    {
+        if (empty($this->services[$name])) {
+            throw new \InvalidArgumentException(sprintf('Service "%s" absent', $name));
         }
-
-        return $this->services[$serviceName]['arguments'];
     }
 }
